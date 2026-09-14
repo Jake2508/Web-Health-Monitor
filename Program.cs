@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using WebsiteHealthMonitor.Components;
 using WebsiteHealthMonitor.Data;
+using WebsiteHealthMonitor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,9 @@ builder.Services.AddHttpClient("health", client =>
     client.Timeout = TimeSpan.FromSeconds(10);
     client.DefaultRequestHeaders.UserAgent.ParseAdd("WebsiteHealthMonitor/1.0");
 });
+
+// Worker
+builder.Services.AddHostedService<HealthCheckWorker>();
 
 
 var app = builder.Build();
