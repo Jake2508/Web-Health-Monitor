@@ -2,7 +2,7 @@
 
 A self-hosted dashboard that checks a list of websites every minute and shows whether each one is up, how fast it answered, and when it was last checked.
 
-![Website Health dashboard](docs/screenshot.png)
+![Website Health dashboard](Images/screenshot.png)
 
 ## Features
 
