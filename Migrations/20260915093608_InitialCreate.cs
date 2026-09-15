@@ -17,8 +17,8 @@ namespace WebsiteHealthMonitor.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", nullable: true),
-                    Url = table.Column<string>(type: "TEXT", nullable: true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Url = table.Column<string>(type: "TEXT", nullable: false),
                     Enabled = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>

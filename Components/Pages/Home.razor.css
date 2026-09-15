@@ -1,0 +1,105 @@
+.monitor {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 8px 0 48px;
+}
+
+.monitor-head h1 {
+    font-size: 1.7rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin: 0 0 6px;
+}
+
+.meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin: 0 0 28px;
+}
+
+.meta .sep { color: #d1d5db; }
+
+.live {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #16a34a;
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+}
+
+.monitor-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.monitor-table th {
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #9ca3af;
+    padding: 11px 16px;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.monitor-table td {
+    padding: 13px 16px;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+}
+
+.monitor-table tr:last-child td { border-bottom: none; }
+.monitor-table tbody tr:hover { background: #fafafa; }
+
+.num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: #6b7280;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.site-name {
+    display: block;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.site-url {
+    display: block;
+    font-size: 0.78rem;
+    color: #9ca3af;
+    margin-top: 1px;
+}
+
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 3px 10px 3px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.pill::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.pill.up   { color: #15803d; background: #dcfce7; }
+.pill.down { color: #b91c1c; background: #fee2e2; }
+.pill.idle { color: #6b7280; background: #f3f4f6; }

@@ -361,3 +361,109 @@ main[b-ezm82beivb] {
         opacity: 0;
     }
 }
+/* /Components/Pages/Home.razor.rz.scp.css */
+.monitor[b-7cnmmeomgs] {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 8px 0 48px;
+}
+
+.monitor-head h1[b-7cnmmeomgs] {
+    font-size: 1.7rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin: 0 0 6px;
+}
+
+.meta[b-7cnmmeomgs] {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin: 0 0 28px;
+}
+
+.meta .sep[b-7cnmmeomgs] { color: #d1d5db; }
+
+.live[b-7cnmmeomgs] {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #16a34a;
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+}
+
+.monitor-table[b-7cnmmeomgs] {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.monitor-table th[b-7cnmmeomgs] {
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #9ca3af;
+    padding: 11px 16px;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.monitor-table td[b-7cnmmeomgs] {
+    padding: 13px 16px;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+}
+
+.monitor-table tr:last-child td[b-7cnmmeomgs] { border-bottom: none; }
+.monitor-table tbody tr:hover[b-7cnmmeomgs] { background: #fafafa; }
+
+.num[b-7cnmmeomgs] {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: #6b7280;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.site-name[b-7cnmmeomgs] {
+    display: block;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.site-url[b-7cnmmeomgs] {
+    display: block;
+    font-size: 0.78rem;
+    color: #9ca3af;
+    margin-top: 1px;
+}
+
+.pill[b-7cnmmeomgs] {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 3px 10px 3px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.pill[b-7cnmmeomgs]::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.pill.up[b-7cnmmeomgs]   { color: #15803d; background: #dcfce7; }
+.pill.down[b-7cnmmeomgs] { color: #b91c1c; background: #fee2e2; }
+.pill.idle[b-7cnmmeomgs] { color: #6b7280; background: #f3f4f6; }

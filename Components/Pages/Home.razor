@@ -1,7 +1,128 @@
 ﻿@page "/"
+@rendermode InteractiveServer
+@using Microsoft.EntityFrameworkCore
+@using WebsiteHealthMonitor.Data
+@implements IDisposable
+@inject IDbContextFactory<AppDbContext> DbFactory
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Health Monitor</PageTitle>
 
-<h1>Hello, world!</h1>
+<section class="monitor">
+    <header class="monitor-head">
+        <h1>Website Health</h1>
+        <p class="meta">
+            <span class="live"></span>
+            @_upCount of @_rows.Count responding
+            <span class="sep">·</span>
+            checked every minute
+            <span class="sep">·</span>
+            refreshed @_lastRefresh.ToLocalTime().ToString("HH:mm:ss")
+        </p>
+    </header>
 
-Welcome to your new app.
+    <table class="monitor-table">
+        <thead>
+            <tr>
+                <th>Site</th>
+                <th>Status</th>
+                <th class="num">Response</th>
+                <th class="num">Checked</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in _rows)
+            {
+                var status = Status(row.Latest);
+                <tr>
+                    <td>
+                        <span class="site-name">@row.Name</span>
+                        <span class="site-url">@row.Url</span>
+                    </td>
+                    <td>
+                        <span class="pill @status.Css">@status.Text</span>
+                    </td>
+                    <td class="num">
+                        @(row.Latest is null ? "—" : $"{row.Latest.ResponseTimeMs} ms")
+                    </td>
+                    <td class="num">
+                        @(row.Latest is null
+                            ? "—"
+                            : row.Latest.CheckedAt.ToLocalTime().ToString("HH:mm:ss"))
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</section>
+
+
+@code {
+    private record Row(string Name, string Url, CheckResult? Latest);
+
+    private List<Row> _rows = new();
+    private DateTime _lastRefresh = DateTime.UtcNow;
+    private int _upCount;
+    private CancellationTokenSource? _cts;
+
+    protected override async Task OnInitializedAsync() => await LoadAsync();
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        _cts = new CancellationTokenSource();
+        _ = RefreshLoopAsync(_cts.Token);
+    }
+
+    private async Task RefreshLoopAsync(CancellationToken ct)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(10));
+        try
+        {
+            while (await timer.WaitForNextTickAsync(ct))
+            {
+                await LoadAsync();
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (OperationCanceledException) { }
+    }
+
+    private static (string Css, string Text) Status(CheckResult? r)
+    {
+        if (r is null) 
+            return ("idle", "not checked");
+        if (r.IsUp)    
+            return ("up", r.StatusCode?.ToString() ?? "OK");
+        
+        return ("down", r.StatusCode?.ToString() ?? r.Error ?? "failed");
+    }
+
+    private async Task LoadAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        var data = await db.Sites
+            .AsNoTracking()
+            .OrderBy(s => s.Id)
+            .Select(s => new
+            {
+                s.Name,
+                s.Url,
+                Latest = s.Results
+                    .OrderByDescending(r => r.CheckedAt)
+                    .FirstOrDefault()
+            })
+            .ToListAsync();
+
+        _rows = data.Select(d => new Row(d.Name, d.Url, d.Latest)).ToList();
+        _upCount = _rows.Count(r => r.Latest?.IsUp == true);
+        _lastRefresh = DateTime.UtcNow;
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
+}

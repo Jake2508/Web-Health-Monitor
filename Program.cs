@@ -39,12 +39,11 @@ using (var scope = app.Services.CreateScope())
 
     if (!await db.Sites.AnyAsync())
     {
-        db.Sites.AddRange(
-            new MonitoredSite { Name = "Google",  Url = "https://www.google.com" },
-            new MonitoredSite { Name = "GitHub",  Url = "https://github.com" },
-            new MonitoredSite { Name = "Portfolio", Url = "https://jake-rose.com" },
-            new MonitoredSite { Name = "Always fails", Url = "https://httpbin.org/status/500" });
+        var seed = app.Configuration
+            .GetSection("Monitoring:Sites")
+            .Get<List<MonitoredSite>>() ?? [];
 
+        db.Sites.AddRange(seed);
         await db.SaveChangesAsync();
     }
 }

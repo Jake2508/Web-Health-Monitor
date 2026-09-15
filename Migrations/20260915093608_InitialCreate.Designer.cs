@@ -11,7 +11,7 @@ using WebsiteHealthMonitor.Data;
 namespace WebsiteHealthMonitor.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260909130300_InitialCreate")]
+    [Migration("20260915093608_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -61,9 +61,11 @@ namespace WebsiteHealthMonitor.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Url")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

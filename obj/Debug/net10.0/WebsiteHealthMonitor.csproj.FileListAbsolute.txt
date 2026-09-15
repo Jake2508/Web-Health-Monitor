@@ -71,8 +71,6 @@ J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\compressed\4t98bunqxm-{0}
 J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\compressed\h9gy64wn61-{0}-abdmv1u4y3-abdmv1u4y3.gz
 J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\compressed\nj3ehutm2w-{0}-9hsif5t8mt-9hsif5t8mt.gz
 J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\compressed\m8z0rwviwh-{0}-dwu72t6gfx-dwu72t6gfx.gz
-J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\compressed\xcvdtqvn1y-{0}-gv2kz5ju4e-gv2kz5ju4e.gz
-J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\compressed\3zw6rir7pk-{0}-gv2kz5ju4e-gv2kz5ju4e.gz
 J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\staticwebassets.build.json
 J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\staticwebassets.build.json.cache
 J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\staticwebassets.development.json
@@ -200,3 +198,6 @@ J:\Net Projects\WebsiteHealthMonitor\bin\Debug\net10.0\runtimes\win-x86\native\e
 J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\WebsiteHealthMonitor.csproj.AssemblyReference.cache
 J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\WebsiteHealthMonitor.sourcelink.json
 J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\WebsiteH.8F41A520.Up2Date
+J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\scopedcss\Components\Pages\Home.razor.rz.scp.css
+J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\compressed\xcvdtqvn1y-{0}-2uipznjngj-2uipznjngj.gz
+J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\compressed\3zw6rir7pk-{0}-2uipznjngj-2uipznjngj.gz
