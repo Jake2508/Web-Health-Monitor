@@ -23,7 +23,6 @@ J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\scopedcss\Components\Layo
 J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\scopedcss\Components\Layout\ReconnectModal.razor.rz.scp.css
 J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\scopedcss\bundle\WebsiteHealthMonitor.styles.css
 J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\scopedcss\projectbundle\WebsiteHealthMonitor.bundle.scp.css
-J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\compressed\phg3e1gvfb-{0}-khy4lop6wu-khy4lop6wu.gz
 J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\compressed\4shu7e1qdi-{0}-bqjiyaj88i-bqjiyaj88i.gz
 J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\compressed\u1vjzmaq9w-{0}-c2jlpeoesf-c2jlpeoesf.gz
 J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\compressed\wv6zopawvi-{0}-erw9l3u2r3-erw9l3u2r3.gz
@@ -199,5 +198,6 @@ J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\WebsiteHealthMonitor.cspr
 J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\WebsiteHealthMonitor.sourcelink.json
 J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\WebsiteH.8F41A520.Up2Date
 J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\scopedcss\Components\Pages\Home.razor.rz.scp.css
-J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\compressed\xcvdtqvn1y-{0}-2uipznjngj-2uipznjngj.gz
-J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\compressed\3zw6rir7pk-{0}-2uipznjngj-2uipznjngj.gz
+J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\compressed\phg3e1gvfb-{0}-qi41wiyf7k-qi41wiyf7k.gz
+J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\compressed\xcvdtqvn1y-{0}-tplpcnmxu0-tplpcnmxu0.gz
+J:\Net Projects\WebsiteHealthMonitor\obj\Debug\net10.0\compressed\3zw6rir7pk-{0}-tplpcnmxu0-tplpcnmxu0.gz

@@ -7,53 +7,70 @@
 
 <PageTitle>Health Monitor</PageTitle>
 
-<section class="monitor">
-    <header class="monitor-head">
-        <h1>Website Health</h1>
-        <p class="meta">
-            <span class="live"></span>
+<div class="page-head">
+    <h1>Website Health</h1>
+    <div class="meta">
+        <span class="meta-strong">
+            <span class="meta-dot" style="background:@HeadlineDotColor" aria-hidden="true"></span>
             @_upCount of @_rows.Count responding
-            <span class="sep">·</span>
-            checked every minute
-            <span class="sep">·</span>
-            refreshed @_lastRefresh.ToLocalTime().ToString("HH:mm:ss")
-        </p>
-    </header>
+        </span>
+        <span class="sep"></span>
+        <span>checked every minute</span>
+        <span class="sep"></span>
+        <span class="mono">refreshed @_lastRefresh.ToLocalTime().ToString("HH:mm:ss")</span>
+    </div>
+</div>
 
-    <table class="monitor-table">
-        <thead>
-            <tr>
-                <th>Site</th>
-                <th>Status</th>
-                <th class="num">Response</th>
-                <th class="num">Checked</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var row in _rows)
-            {
-                var status = Status(row.Latest);
-                <tr>
-                    <td>
-                        <span class="site-name">@row.Name</span>
-                        <span class="site-url">@row.Url</span>
-                    </td>
-                    <td>
-                        <span class="pill @status.Css">@status.Text</span>
-                    </td>
-                    <td class="num">
-                        @(row.Latest is null ? "—" : $"{row.Latest.ResponseTimeMs} ms")
-                    </td>
-                    <td class="num">
-                        @(row.Latest is null
-                            ? "—"
-                            : row.Latest.CheckedAt.ToLocalTime().ToString("HH:mm:ss"))
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</section>
+<div class="card" role="table" aria-label="Monitored sites">
+    <div class="row head" role="row">
+        <div role="columnheader">SITE</div>
+        <div role="columnheader">STATUS</div>
+        <div role="columnheader" class="r">RESPONSE</div>
+        <div role="columnheader" class="r">CHECKED</div>
+    </div>
+
+    @if (!HasResults)
+    {
+        <div class="row empty" role="row">
+            <div role="cell">waiting for first check…</div>
+        </div>
+    }
+    else
+    {
+        @foreach (var row in _rows)
+        {
+            var tone = Tone(row.Latest);
+            <div class="row" role="row">
+                <div class="site" role="cell">
+                    <span class="name" title="@row.Name">@row.Name</span>
+                    <span class="url" title="@row.Url">@row.Url</span>
+                </div>
+                <div role="cell">
+                    <span class="pill @tone" title="@Label(row.Latest)">
+                        <span class="dot" aria-hidden="true"></span>
+                        <span class="pill-label">@Label(row.Latest)</span>
+                    </span>
+                </div>
+                <div class="metric" role="cell">
+                    @if (row.Latest is null)
+                    {
+                        <span class="ms">—</span>
+                    }
+                    else
+                    {
+                        <span class="ms">@row.Latest.ResponseTimeMs ms</span>
+                        <span class="track" aria-hidden="true">
+                            <span class="fill @tone" style="width:@(Pct(row.Latest))%"></span>
+                        </span>
+                    }
+                </div>
+                <div class="checked" role="cell">
+                    @(row.Latest is null ? "—" : row.Latest.CheckedAt.ToLocalTime().ToString("HH:mm:ss"))
+                </div>
+            </div>
+        }
+    }
+</div>
 
 
 @code {
@@ -62,7 +79,16 @@
     private List<Row> _rows = new();
     private DateTime _lastRefresh = DateTime.UtcNow;
     private int _upCount;
+    private int _slowestRespondingMs;
     private CancellationTokenSource? _cts;
+
+    private bool HasResults => _rows.Any(r => r.Latest is not null);
+
+    // Green when every site is up, red when anything is down, neutral before the first check lands
+    private string HeadlineDotColor =>
+        !HasResults ? "var(--muted-2)"
+        : _upCount == _rows.Count ? "var(--ok)"
+        : "var(--bad)";
 
     protected override async Task OnInitializedAsync() => await LoadAsync();
 
@@ -88,14 +114,32 @@
         catch (OperationCanceledException) { }
     }
 
-    private static (string Css, string Text) Status(CheckResult? r)
+    /// <summary>
+    /// ok = 2xx, warn = any other HTTP status, bad = no response at all (DNS, timeout, refused).
+    /// "idle" covers a site that has no check recorded yet.
+    /// </summary>
+    private static string Tone(CheckResult? r) => r switch
     {
-        if (r is null) 
-            return ("idle", "not checked");
-        if (r.IsUp)    
-            return ("up", r.StatusCode?.ToString() ?? "OK");
-        
-        return ("down", r.StatusCode?.ToString() ?? r.Error ?? "failed");
+        null                                        => "idle",
+        { StatusCode: null }                        => "bad",
+        { StatusCode: >= 200 and <= 299 }           => "ok",
+        _                                           => "warn"
+    };
+
+    private static string Label(CheckResult? r) =>
+        r is null ? "not checked" : r.StatusCode?.ToString() ?? r.Error ?? "failed";
+
+    /// <summary>
+    /// Bar width as a percentage of the slowest site that actually responded.
+    /// Failed checks (no status) get a full bar so a timeout doesn't flatten every other row.
+    /// </summary>
+    private int Pct(CheckResult r)
+    {
+        if (r.StatusCode is null) return 100;
+        if (_slowestRespondingMs <= 0) return 6;
+
+        var pct = (int)Math.Round(r.ResponseTimeMs * 100.0 / _slowestRespondingMs);
+        return Math.Clamp(pct, 6, 100);
     }
 
     private async Task LoadAsync()
@@ -117,6 +161,11 @@
 
         _rows = data.Select(d => new Row(d.Name, d.Url, d.Latest)).ToList();
         _upCount = _rows.Count(r => r.Latest?.IsUp == true);
+        _slowestRespondingMs = _rows
+            .Where(r => r.Latest?.StatusCode is not null)
+            .Select(r => r.Latest!.ResponseTimeMs)
+            .DefaultIfEmpty(0)
+            .Max();
         _lastRefresh = DateTime.UtcNow;
     }
 
