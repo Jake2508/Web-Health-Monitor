@@ -1,0 +1,145 @@
+/* ---------- Card / grid table ---------- */
+.card {
+    margin-top: 28px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    overflow-x: auto;   /* clips corners like overflow:hidden; scrolls on narrow screens */
+    background: var(--surface);
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 1fr 120px 150px 110px;
+    align-items: center;
+    min-width: 560px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--line-soft);
+}
+
+.row:last-child {
+    border-bottom: 0;
+}
+
+.row:not(.head):not(.empty):hover {
+    background: #fafafb;
+}
+
+.row.head {
+    padding: 11px 20px;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--line);
+    font: 600 10px/1 var(--font-mono);
+    letter-spacing: .1em;
+    color: var(--muted-2);
+}
+
+.r {
+    text-align: right;
+}
+
+/* ---------- Site ---------- */
+.site {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    padding-right: 16px;
+}
+
+.name,
+.url {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.name {
+    font: 600 14px/1.2 var(--font-sans);
+    color: var(--ink);
+}
+
+.url {
+    font: 400 12px/1.2 var(--font-mono);
+    color: var(--muted-2);
+}
+
+/* ---------- Status pill ---------- */
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    padding: 3px 9px 3px 7px;
+    border-radius: 3px;
+    font: 500 12px/1.5 var(--font-mono);
+    white-space: nowrap;
+}
+
+.pill-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pill .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    flex: none;
+}
+
+.pill.ok   { background: var(--ok-bg);   color: var(--ok-fg); }
+.pill.warn { background: var(--warn-bg); color: var(--warn-fg); }
+.pill.bad  { background: var(--bad-bg);  color: var(--bad-fg); }
+.pill.idle { background: var(--line-soft); color: var(--muted); }
+
+.pill.ok .dot   { background: var(--ok); }
+.pill.warn .dot { background: var(--warn); }
+.pill.bad .dot  { background: var(--bad); }
+.pill.idle .dot { background: var(--muted-2); }
+
+/* ---------- Response metric ---------- */
+.metric {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+}
+
+.ms {
+    font: 500 13px/1 var(--font-mono);
+    color: var(--ink-2);
+    white-space: nowrap;
+}
+
+.track {
+    display: block;
+    width: 90px;
+    height: 3px;
+    border-radius: 2px;
+    background: #eff0f3;
+    overflow: hidden;
+}
+
+.fill {
+    display: block;
+    height: 100%;
+    border-radius: 2px;
+}
+
+.fill.ok   { background: var(--ok); }
+.fill.warn { background: var(--warn); }
+.fill.bad  { background: var(--bad); }
+
+/* ---------- Checked ---------- */
+.checked {
+    text-align: right;
+    font: 400 13px/1 var(--font-mono);
+    color: var(--muted-2);
+}
+
+/* ---------- Empty state ---------- */
+.row.empty {
+    grid-template-columns: 1fr;
+    font: 400 13px/1 var(--font-mono);
+    color: var(--muted-2);
+}

@@ -1,7 +1,177 @@
 ﻿@page "/"
+@rendermode InteractiveServer
+@using Microsoft.EntityFrameworkCore
+@using WebsiteHealthMonitor.Data
+@implements IDisposable
+@inject IDbContextFactory<AppDbContext> DbFactory
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Health Monitor</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="page-head">
+    <h1>Website Health</h1>
+    <div class="meta">
+        <span class="meta-strong">
+            <span class="meta-dot" style="background:@HeadlineDotColor" aria-hidden="true"></span>
+            @_upCount of @_rows.Count responding
+        </span>
+        <span class="sep"></span>
+        <span>checked every minute</span>
+        <span class="sep"></span>
+        <span class="mono">refreshed @_lastRefresh.ToLocalTime().ToString("HH:mm:ss")</span>
+    </div>
+</div>
 
-Welcome to your new app.
+<div class="card" role="table" aria-label="Monitored sites">
+    <div class="row head" role="row">
+        <div role="columnheader">SITE</div>
+        <div role="columnheader">STATUS</div>
+        <div role="columnheader" class="r">RESPONSE</div>
+        <div role="columnheader" class="r">CHECKED</div>
+    </div>
+
+    @if (!HasResults)
+    {
+        <div class="row empty" role="row">
+            <div role="cell">waiting for first check…</div>
+        </div>
+    }
+    else
+    {
+        @foreach (var row in _rows)
+        {
+            var tone = Tone(row.Latest);
+            <div class="row" role="row">
+                <div class="site" role="cell">
+                    <span class="name" title="@row.Name">@row.Name</span>
+                    <span class="url" title="@row.Url">@row.Url</span>
+                </div>
+                <div role="cell">
+                    <span class="pill @tone" title="@Label(row.Latest)">
+                        <span class="dot" aria-hidden="true"></span>
+                        <span class="pill-label">@Label(row.Latest)</span>
+                    </span>
+                </div>
+                <div class="metric" role="cell">
+                    @if (row.Latest is null)
+                    {
+                        <span class="ms">—</span>
+                    }
+                    else
+                    {
+                        <span class="ms">@row.Latest.ResponseTimeMs ms</span>
+                        <span class="track" aria-hidden="true">
+                            <span class="fill @tone" style="width:@(Pct(row.Latest))%"></span>
+                        </span>
+                    }
+                </div>
+                <div class="checked" role="cell">
+                    @(row.Latest is null ? "—" : row.Latest.CheckedAt.ToLocalTime().ToString("HH:mm:ss"))
+                </div>
+            </div>
+        }
+    }
+</div>
+
+
+@code {
+    private record Row(string Name, string Url, CheckResult? Latest);
+
+    private List<Row> _rows = new();
+    private DateTime _lastRefresh = DateTime.UtcNow;
+    private int _upCount;
+    private int _slowestRespondingMs;
+    private CancellationTokenSource? _cts;
+
+    private bool HasResults => _rows.Any(r => r.Latest is not null);
+
+    // Green when every site is up, red when anything is down, neutral before the first check lands
+    private string HeadlineDotColor =>
+        !HasResults ? "var(--muted-2)"
+        : _upCount == _rows.Count ? "var(--ok)"
+        : "var(--bad)";
+
+    protected override async Task OnInitializedAsync() => await LoadAsync();
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        _cts = new CancellationTokenSource();
+        _ = RefreshLoopAsync(_cts.Token);
+    }
+
+    private async Task RefreshLoopAsync(CancellationToken ct)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(10));
+        try
+        {
+            while (await timer.WaitForNextTickAsync(ct))
+            {
+                await LoadAsync();
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (OperationCanceledException) { }
+    }
+
+    /// <summary>
+    /// ok = 2xx, warn = any other HTTP status, bad = no response at all (DNS, timeout, refused).
+    /// "idle" covers a site that has no check recorded yet.
+    /// </summary>
+    private static string Tone(CheckResult? r) => r switch
+    {
+        null                                        => "idle",
+        { StatusCode: null }                        => "bad",
+        { StatusCode: >= 200 and <= 299 }           => "ok",
+        _                                           => "warn"
+    };
+
+    private static string Label(CheckResult? r) =>
+        r is null ? "not checked" : r.StatusCode?.ToString() ?? r.Error ?? "failed";
+
+    /// <summary>
+    /// Bar width as a percentage of the slowest site that actually responded.
+    /// Failed checks (no status) get a full bar so a timeout doesn't flatten every other row.
+    /// </summary>
+    private int Pct(CheckResult r)
+    {
+        if (r.StatusCode is null) return 100;
+        if (_slowestRespondingMs <= 0) return 6;
+
+        var pct = (int)Math.Round(r.ResponseTimeMs * 100.0 / _slowestRespondingMs);
+        return Math.Clamp(pct, 6, 100);
+    }
+
+    private async Task LoadAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        var data = await db.Sites
+            .AsNoTracking()
+            .OrderBy(s => s.Id)
+            .Select(s => new
+            {
+                s.Name,
+                s.Url,
+                Latest = s.Results
+                    .OrderByDescending(r => r.CheckedAt)
+                    .FirstOrDefault()
+            })
+            .ToListAsync();
+
+        _rows = data.Select(d => new Row(d.Name, d.Url, d.Latest)).ToList();
+        _upCount = _rows.Count(r => r.Latest?.IsUp == true);
+        _slowestRespondingMs = _rows
+            .Where(r => r.Latest?.StatusCode is not null)
+            .Select(r => r.Latest!.ResponseTimeMs)
+            .DefaultIfEmpty(0)
+            .Max();
+        _lastRefresh = DateTime.UtcNow;
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
+}
