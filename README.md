@@ -1,85 +1,64 @@
 # Website Health Monitor
 
-A self-hosted dashboard that checks a list of websites every minute and shows whether each one is up, how fast it answered, and when it was last checked.
+**Repository for my self-hosted website uptime monitor**
+
+---
+
+## Overview
+
+A dashboard that checks a list of websites every minute and shows whether each one is up, how fast it responded, and when it was last checked. A background worker runs the checks and stores every result in **SQLite**, and the **Blazor** dashboard updates itself live. Built with **C#** and **.NET 10**.
+
+---
 
 ![Website Health dashboard](Images/screenshot.png)
 
+---
+
 ## Features
 
-- **Checks every minute.** A background worker sends a request to every enabled site and records the status code and response time.
-- **Clear status colours.** Green for 2xx, amber for other HTTP statuses (e.g. `404`), red when there's no response at all (`DNS Failed`, `Timed Out`).
-- **Latency bars.** Each row's bar is scaled against the slowest site that responded, so you can compare response times at a glance.
-- **Live dashboard.** The page refreshes itself every 10 seconds, so you never need to reload.
-- **7-day history.** Results are stored in SQLite, and anything older than 7 days is pruned automatically.
-- **Zero setup database.** The database file is created and migrated on startup, and sites are seeded from `appsettings.json`.
+- **Background Checks**: A worker sends a request to every enabled site once a minute and records the status code and response time.
+- **Clear Status Colours**: Green for 2xx, amber for other HTTP statuses (e.g. `404`), red when there's no response at all (`DNS Failed`, `Timed Out`).
+- **Latency Bars**: Each bar is scaled against the slowest site, so response times can be compared at a glance.
+- **Live Dashboard**: The page refreshes every 10 seconds, so there's no need to reload.
+- **7-Day History**: Results older than 7 days are pruned automatically.
+- **Zero-Setup Database**: The database is created and migrated on startup, and sites are seeded from `appsettings.json`.
 
-## Tech stack
+---
 
-| Layer      | Choice                                             |
-|------------|----------------------------------------------------|
-| Framework  | .NET 10, Blazor Web App (Interactive Server)       |
-| Data       | Entity Framework Core 10 + SQLite                  |
-| Checks     | `BackgroundService` + `IHttpClientFactory`         |
-| UI         | Plain CSS (no Bootstrap), IBM Plex Sans / Mono     |
+## Getting Started
 
-## Getting started
+To get the project up and running on your local machine, follow these steps:
 
-**Prerequisites:** [.NET 10 SDK](https://dotnet.microsoft.com/download)
+1. **Install the [.NET 10 SDK](https://dotnet.microsoft.com/download)**
 
-```bash
-git clone https://github.com/Jake2508/Web-Health-Monitor.git
-cd Web-Health-Monitor
-dotnet run
-```
+2. **Clone the repository**:
+   ```bash
+   git clone https://github.com/Jake2508/Web-Health-Monitor.git
+   cd Web-Health-Monitor
+   ```
 
-Open http://localhost:5266. For HTTPS, run `dotnet run --launch-profile https` and open https://localhost:7290.
+3. **Run the app**:
+   ```bash
+   dotnet run
+   ```
 
-The first check runs as soon as the app starts, so the dashboard fills in within a few seconds.
+4. **Open** [http://localhost:5266](http://localhost:5266). The first check runs on startup, so the dashboard fills in within a few seconds.
 
-## Configuration
+Note: the sites to monitor are set in `appsettings.json`, but they only seed an empty database. To change them after the first run, stop the app and delete `monitor.db`.
 
-Sites are defined in `appsettings.json`:
+---
 
-```json
-"Monitoring": {
-  "Sites": [
-    { "Name": "Portfolio", "Url": "https://jake-rose.com" },
-    { "Name": "DNS test",  "Url": "https://not-a-real-domain-jr.dev" }
-  ]
-}
-```
+## Built With
 
-> **Note:** this list is only used to seed an **empty** database. After the first run, editing `appsettings.json` has no effect. To re-seed, stop the app and delete `monitor.db` (it's git-ignored).
+.NET 10 / Blazor - Web app and live dashboard UI.
 
-Other settings are constants in code:
+C# - Background health check worker and app logic.
 
-| Setting                  | Value      | Where                                    |
-|--------------------------|------------|------------------------------------------|
-| Check interval           | 1 minute   | `Services/HealthCheckWorker.cs`          |
-| Result retention         | 7 days     | `Services/HealthCheckWorker.cs`          |
-| Request timeout          | 10 seconds | `Program.cs` (`"health"` HttpClient)     |
-| Dashboard refresh        | 10 seconds | `Components/Pages/Home.razor`            |
-| Database connection      | `Data Source=monitor.db` | `appsettings.json`         |
+Entity Framework Core + SQLite - Stores sites and check results.
 
-## How it works
+CSS - Custom styling, no UI framework.
 
-1. On startup, `Program.cs` applies EF Core migrations and seeds sites if the table is empty.
-2. `HealthCheckWorker` runs one cycle immediately, then once a minute:
-   - sends a `GET` to each enabled site, reading headers only (the body isn't downloaded)
-   - saves a `CheckResult` with the status code, response time, and an error label if the request failed
-   - deletes results older than the retention window
-3. `Home.razor` loads the latest result for each site and re-queries every 10 seconds.
+## Author
+***Jake Rose***
 
-A site counts as **responding** when it returns a 2xx status.
-
-## Project structure
-
-```
-Components/
-  Layout/        MainLayout, NavMenu (sidebar)
-  Pages/         Home (dashboard), History (placeholder)
-Data/            AppDbContext, MonitoredSite, CheckResult
-Migrations/      EF Core migrations
-Services/        HealthCheckWorker (background checks)
-wwwroot/app.css  Design tokens and shared styles
-```
+Website: [https://jake-rose.com/](https://jake-rose.com/)
